@@ -33,19 +33,19 @@ module Network.Tangaroa.Types
   , Event(..)
   ) where
 
-import Control.Concurrent (ThreadId)
-import Control.Concurrent.Chan.Unagi
-import Control.Lens hiding (Index)
-import Control.Monad.RWS
-import Data.Binary
-import Data.Sequence (Seq)
-import qualified Data.Sequence as Seq
-import Data.Map (Map)
+import           Control.Concurrent (ThreadId)
+import           Control.Concurrent.Chan.Unagi
+import           Control.Lens hiding (Index)
+import           Control.Monad.RWS
+import           Data.Binary
+import           Data.Map (Map)
 import qualified Data.Map as Map
-import Data.Set (Set)
+import           Data.Sequence (Seq)
+import qualified Data.Sequence as Seq
+import           Data.Set (Set)
 import qualified Data.Set as Set
 
-import GHC.Generics
+import           GHC.Generics
 
 newtype Term = Term Int
   deriving (Show, Read, Eq, Ord, Generic, Num)

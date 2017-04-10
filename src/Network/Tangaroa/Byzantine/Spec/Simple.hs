@@ -3,21 +3,26 @@ module Network.Tangaroa.Byzantine.Spec.Simple
   , runClient
   ) where
 
-import Network.Tangaroa.Byzantine.Server
-import Network.Tangaroa.Byzantine.Client
-import Network.Tangaroa.Byzantine.Types
+import           Network.Tangaroa.Byzantine.Server
+import           Network.Tangaroa.Byzantine.Client
+import           Network.Tangaroa.Byzantine.Types
 
-import Control.Lens
-import Data.Word
-import Data.Binary
-import Network.Socket
-import System.Console.GetOpt
-import System.Environment
-import System.Exit
-import Text.Read
-import qualified Data.Set as Set
+import           Codec.Crypto.RSA
+import           Control.Lens
+
+import           Data.Binary
+import qualified Data.ByteString.Char8 as B8
 import qualified Data.Map as Map
-import Codec.Crypto.RSA
+import qualified Data.Set as Set
+
+import           Network.Socket hiding (recv, sendTo)
+import           Network.Socket.ByteString (recv, sendTo)
+
+import           System.Console.GetOpt
+import           System.Environment
+import           System.Exit
+
+import           Text.Read
 
 options :: [OptDescr (Config NodeType -> IO (Config NodeType))]
 options =
@@ -104,11 +109,12 @@ getPrivateKey filename conf = do
     Nothing -> conf
 
 getMsg :: Socket -> IO String
-getMsg sock = recv sock 8192
+getMsg sock = show <$> recv sock 8192
+-- TODO change these types to bytestring, wtf is string doing here.
 
 msgSend :: Socket -> NodeType -> String -> IO ()
 msgSend sock node s =
-  sendTo sock s (nodeSockAddr node) >> return ()
+  sendTo sock (B8.pack s) (nodeSockAddr node) >> return ()
 
 showDebug :: NodeType -> String -> IO ()
 showDebug node msg = putStrLn $ show (snd node) ++ " " ++ msg

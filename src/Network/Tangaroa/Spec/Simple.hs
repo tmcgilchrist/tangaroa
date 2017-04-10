@@ -3,17 +3,19 @@ module Network.Tangaroa.Spec.Simple
   , runClient
   ) where
 
-import Network.Tangaroa.Server
-import Network.Tangaroa.Client
+import           Network.Tangaroa.Client
+import           Network.Tangaroa.Server
 
-import Control.Lens
-import Data.Word
-import Network.Socket
-import System.Console.GetOpt
-import System.Environment
-import System.Exit
-import Text.Read
+import           Control.Lens
+import qualified Data.ByteString.Char8 as B8
 import qualified Data.Set as Set
+import           Data.Word
+import           Network.Socket hiding (recv, sendTo)
+import           Network.Socket.ByteString
+import           System.Console.GetOpt
+import           System.Environment
+import           System.Exit
+import           Text.Read
 
 options :: [OptDescr (Config NodeType -> Config NodeType)]
 options =
@@ -60,11 +62,12 @@ addOtherNode =
   maybe id (\p -> otherNodes %~ Set.insert (localhost, p)) . readMaybe
 
 getMsg :: Socket -> IO String
-getMsg sock = recv sock 8192
+getMsg sock = show <$> recv sock 8192
+-- TODO change thse types to bytestring, wtf is string doing here.
 
 msgSend :: Socket -> NodeType -> String -> IO ()
 msgSend sock node s =
-  sendTo sock s (nodeSockAddr node) >> return ()
+  sendTo sock (B8.pack s) (nodeSockAddr node) >> return ()
 
 showDebug :: NodeType -> String -> IO ()
 showDebug node msg = putStrLn $ show (snd node) ++ " " ++ msg
